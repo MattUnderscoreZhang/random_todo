@@ -1,0 +1,72 @@
+- name: "app"
+  description: |
+    Run this as a Marimo app.
+    ```
+    current_user = get_current_user()
+    decks = get_decks_for_user(current_user)
+    selected_deck = ask_user_to_select_deck(decks)
+    play_deck(selected_deck)
+    ```
+  children:
+    - name: "get_current_user"
+      description: |
+        Currently returns "local_user".
+      future:
+        - figure out cloud account login
+      output:
+        user: "User"
+    - name: "get_decks_for_user"
+      description: |
+        Get decks belonging to the given user.
+        The data is retrieved from a local database.
+      input:
+        user: "User"
+      output:
+        decks: "list[Deck]"
+      future:
+        - add data retrieval from cloud database
+    - name: "ask_user_to_select_deck"
+      description: |
+        Ask the user to select a deck.
+        It will display a list of decks and allow the user to select one.
+        ```
+        selected_deck = ask_user_to_select_deck(decks)
+        return selected_deck
+        ```
+      input:
+        decks: "list[Deck]"
+      output:
+        selected_deck: "Deck"
+    - name: "play_deck"
+      description: |
+        Play through the selected deck.
+        It will display up to three random cards from the deck.
+        The user can select one card to become active, and then complete it or put it back.
+        ```
+        while True:
+          cards = get_random_cards_from_deck(selected_deck)
+          display_cards(cards)
+          selected_card = ask_user_to_select_card(cards)
+          if selected_card is None:
+            break
+          mark_card_as_active(selected_card)
+          if ask_user_to_complete_card(selected_card):
+            mark_card_as_completed(selected_card)
+          else:
+            put_card_back(selected_card)
+        ```
+      input:
+        deck: "Deck"
+      children:
+        - name: "get_random_cards_from_deck"
+          description: Get up to three random cards from the deck.
+          input:
+            deck: "Deck"
+          output:
+            cards: "list[Card]"
+        - name: "ask_user_to_select_card"
+          description: Ask the user to select a card from the displayed cards.
+          input:
+            cards: "list[Card]"
+          output:
+            selected_card: "Card | None"
